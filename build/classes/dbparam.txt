@@ -1,0 +1,7 @@
+# MySQL
+url=jdbc:mysql://localhost/adressverwaltung
+user=root
+password=gibbiX12345
+
+# Apache Derby
+#url=jdbc:derby:../db/gkjava_db
