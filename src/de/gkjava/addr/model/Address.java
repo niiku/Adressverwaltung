@@ -3,135 +3,70 @@ package de.gkjava.addr.model;
 import java.text.Collator;
 
 /**
- * @author  vmadmin
+ * @author vmadmin
  */
 public class Address implements Comparable<Address> {
-  /**
- * @uml.property  name="id"
- */
-private int id;
-  /**
- * @uml.property  name="lastname"
- */
-private String lastname;
-  /**
- * @uml.property  name="firstname"
- */
-private String firstname;
-  /**
- * @uml.property  name="email"
- */
-private String email;
-  /**
- * @uml.property  name="emailAdditional"
- */
-private String emailAdditional;
-  /**
- * @uml.property  name="homepage"
- */
-private String homepage;
 
-  /**
- * @return
- * @uml.property  name="id"
- */
-public int getId() {
-    return id;
-  }
+    private int id;
+    private String lastname;
+    private String firstname;
+    private String email;
+    private String emailAdditional;
+    private String homepage;
 
-  /**
- * @param id
- * @uml.property  name="id"
- */
-public void setId(int id) {
-    this.id = id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  /**
- * @return
- * @uml.property  name="lastname"
- */
-public String getLastname() {
-    return lastname;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  /**
- * @param lastname
- * @uml.property  name="lastname"
- */
-public void setLastname(String lastname) {
-    this.lastname = lastname;
-  }
+    public String getLastname() {
+        return lastname;
+    }
 
-  /**
- * @return
- * @uml.property  name="firstname"
- */
-public String getFirstname() {
-    return firstname;
-  }
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
 
-  /**
- * @param firstname
- * @uml.property  name="firstname"
- */
-public void setFirstname(String firstname) {
-    this.firstname = firstname;
-  }
+    public String getFirstname() {
+        return firstname;
+    }
 
-  /**
- * @return
- * @uml.property  name="email"
- */
-public String getEmail() {
-    return email;
-  }
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
 
-  /**
- * @param email
- * @uml.property  name="email"
- */
-public void setEmail(String email) {
-    this.email = email;
-  }
+    public String getEmail() {
+        return email;
+    }
 
-  /**
- * @return
- * @uml.property  name="emailAdditional"
- */
-public String getEmailAdditional() {
-    return emailAdditional;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  /**
- * @param emailAdditional
- * @uml.property  name="emailAdditional"
- */
-public void setEmailAdditional(String emailAdditional) {
-    this.emailAdditional = emailAdditional;
-  }
+    public String getEmailAdditional() {
+        return emailAdditional;
+    }
 
-  /**
- * @return
- * @uml.property  name="homepage"
- */
-public String getHomepage() {
-    return homepage;
-  }
+    public void setEmailAdditional(String emailAdditional) {
+        this.emailAdditional = emailAdditional;
+    }
 
-  /**
- * @param homepage
- * @uml.property  name="homepage"
- */
-public void setHomepage(String homepage) {
-    this.homepage = homepage;
-  }
+    public String getHomepage() {
+        return homepage;
+    }
 
-  // Wird für die Sortierung der Adressliste benutzt
-  public int compareTo(Address a) {
-    Collator collator = Collator.getInstance();
-    String s1 = lastname + ", " + firstname;
-    String s2 = a.getLastname() + ", " + a.getFirstname();
-    return collator.compare(s1, s2);
-  }
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
+
+    // Wird für die Sortierung der Adressliste benutzt
+    public int compareTo(Address a) {
+        Collator collator = Collator.getInstance();
+        String s1 = lastname + ", " + firstname;
+        String s2 = a.getLastname() + ", " + a.getFirstname();
+        return collator.compare(s1, s2);
+    }
 }
