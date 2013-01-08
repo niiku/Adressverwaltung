@@ -58,7 +58,7 @@ public class ViewEditPanel {
         labelPanel.add(new JLabel(controller
                 .getText("address.homepage"), JLabel.RIGHT));
         labelPanel.add(new JLabel(controller
-                .getText("address.fixed"), JLabel.RIGHT));
+                .getText("address.fixed_network"), JLabel.RIGHT));
         labelPanel.add(new JLabel(controller
                 .getText("address.mobile"), JLabel.RIGHT));
 
@@ -136,6 +136,8 @@ public class ViewEditPanel {
         emailField.setText(address.getEmail());
         emailAdditionalField.setText(address.getEmailAdditional());
         homepageField.setText(address.getHomepage());
+        fixedNetwork.setText(address.getFixedNetwork());
+        mobile.setText(address.getMobile());
     }
 
     // Übertragung Formularfelder --> Adress-Objekt
@@ -148,6 +150,8 @@ public class ViewEditPanel {
         address.setEmailAdditional(emailAdditionalField.getText()
                 .trim());
         address.setHomepage(homepageField.getText().trim());
+        address.setFixedNetwork(fixedNetwork.getText().trim());
+        address.setMobile(mobile.getText().trim());
         return address;
     }
 
@@ -157,6 +161,8 @@ public class ViewEditPanel {
         emailField.setText("");
         emailAdditionalField.setText("");
         homepageField.setText("");
+        fixedNetwork.setText("");
+        mobile.setText("");
     }
 
     public void enable(boolean b) {
@@ -165,6 +171,8 @@ public class ViewEditPanel {
         emailField.setEnabled(b);
         emailAdditionalField.setEnabled(b);
         homepageField.setEnabled(b);
+        fixedNetwork.setEnabled(b);
+        mobile.setEnabled(b);
         okButton.setEnabled(b);
         cancelButton.setEnabled(b);
     }

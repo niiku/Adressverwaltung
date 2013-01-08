@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JToolBar;
 
 import de.gkjava.addr.controller.Controller;
+import de.gkjava.addr.controller.Export;
 
 /**
  * @author  vmadmin
@@ -70,10 +71,20 @@ private JToolBar toolBar;
     icon = new ImageIcon(getClass().getResource("export.png"));
     exportButton = new JButton(icon);
     exportButton.setToolTipText(controller
-        .getText("button.export"));
+        .getText("button.export.csv"));
     exportButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        controller.doExport();
+        controller.doExport(Export.CSV);
+      }
+    });
+    
+        icon = new ImageIcon(getClass().getResource("object.png"));
+    exportButton = new JButton(icon);
+    exportButton.setToolTipText(controller
+        .getText("button.export.object"));
+    exportButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        controller.doExport(Export.OBJECT);
       }
     });
 

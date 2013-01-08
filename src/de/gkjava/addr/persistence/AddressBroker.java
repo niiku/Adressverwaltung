@@ -41,6 +41,8 @@ public static AddressBroker getInstance() {
     a.setEmail(rs.getString(4));
     a.setEmailAdditional(rs.getString(5));
     a.setHomepage(rs.getString(6));
+    a.setFixedNetwork(rs.getString(7));
+    a.setMobile(rs.getString(8));
     return a;
   }
 
@@ -54,11 +56,11 @@ public static AddressBroker getInstance() {
   public int insert(Address a) throws Exception {
     return insertAndReturnKey("insert into address "
         + "(lastname, firstname, email, " 
-        +	"email_additional, homepage) "
+        +	"email_additional, homepage, fixed_network, mobile) "
         + "values ('" + a.getLastname() + "','"
         + a.getFirstname() + "','" + a.getEmail() + "','"
         + a.getEmailAdditional() + "','" + a.getHomepage()
-        + "')");
+        + "', '"+a.getFixedNetwork()+"','"+a.getMobile()+"');");
   }
 
   // Eine Adresse ändern
@@ -68,6 +70,8 @@ public static AddressBroker getInstance() {
         + a.getFirstname() + "', email = '" + a.getEmail()
         + "', email_additional = '" + a.getEmailAdditional()
         + "', homepage = '" + a.getHomepage()
+        + "', fixed_network = '" + a.getFixedNetwork()
+        + "', mobile = '" + a.getMobile()
         + "' where id = " + a.getId());
   }
 

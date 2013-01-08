@@ -1,11 +1,12 @@
 package de.gkjava.addr.model;
 
+import java.io.Serializable;
 import java.text.Collator;
 
 /**
  * @author vmadmin
  */
-public class Address implements Comparable<Address> {
+public class Address implements Comparable<Address>, Serializable {
 
     private int id;
     private String lastname;
@@ -13,6 +14,8 @@ public class Address implements Comparable<Address> {
     private String email;
     private String emailAdditional;
     private String homepage;
+    private String fixedNetwork;
+    private String mobile;
 
     public int getId() {
         return id;
@@ -21,6 +24,23 @@ public class Address implements Comparable<Address> {
     public void setId(int id) {
         this.id = id;
     }
+
+    public String getFixedNetwork() {
+        return fixedNetwork;
+    }
+
+    public void setFixedNetwork(String fixedNetwork) {
+        this.fixedNetwork = fixedNetwork;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+    
 
     public String getLastname() {
         return lastname;
