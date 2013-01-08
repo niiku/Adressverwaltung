@@ -1,5 +1,8 @@
 package de.gkjava.addr.controller;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
+import au.com.bytecode.opencsv.bean.CsvToBean;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -8,7 +11,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import de.gkjava.addr.model.Address;
@@ -16,39 +18,39 @@ import de.gkjava.addr.model.Model;
 import de.gkjava.addr.persistence.AddressBroker;
 import de.gkjava.addr.persistence.ConnectionManager;
 import de.gkjava.addr.view.ViewFrame;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import utils.GuiUtils;
+import utils.StringUtils;
 
 /**
  * @author vmadmin
  */
 public class Controller {
 
-    /**
-     * @uml.property name="model"
-     * @uml.associationEnd
-     */
     private Model model;
-    /**
-     * @uml.property name="frame"
-     * @uml.associationEnd
-     */
     private ViewFrame frame;
     private boolean update;
     private int selectedIndex = -1;
     private static final String BUNDLE = "de.gkjava.addr.bundle";
     private ResourceBundle bundle;
+    private String sep = ",";
+    private String quote = "\"";
 
     public Controller(Model model) {
         this.model = model;
         bundle = ResourceBundle.getBundle(BUNDLE);
     }
 
-    /**
-     * @param frame
-     * @uml.property name="frame"
-     */
     public void setFrame(ViewFrame frame) {
         this.frame = frame;
     }
@@ -165,81 +167,129 @@ public class Controller {
     }
 
     // Exportiert alle Adressen im CSV-Format
-    public void doExport(Export export) {
-        JFileChooser chooser = new JFileChooser();
-        int opt = chooser.showSaveDialog(frame);
-        if (opt != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-
+    public void doExport(DataType type) {
         try {
-            File file = chooser.getSelectedFile();
-
-            switch (export) {
+            File file = GuiUtils.getFileFromSaveDialog(frame);
+            if (file == null) {
+                return;
+            }
+            switch (type) {
                 case CSV:
                     csvExport(file);
                     break;
                 case OBJECT:
                     objectExport(file);
+                    break;
             }
+
             JOptionPane.showMessageDialog(frame, file,
                     getText("message.filesaved"),
                     JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, e.getMessage(),
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame, ex.getMessage(),
                     getText("message.error"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void objectExport(File file) {
+    public void doImport(DataType type) {
         try {
-            FileOutputStream fileOut =
-                    new FileOutputStream(file);
-            ObjectOutputStream out =
-                    new ObjectOutputStream(fileOut);
-            out.writeObject(model.getData());
-            out.close();
-            fileOut.close();
-        } catch (IOException i) {
-            i.printStackTrace();
+            File file = GuiUtils.getFileFromOpenDialog(frame);
+            if (file == null) {
+                return;
+            }
+            switch (type) {
+                case CSV:
+                    csvImport(file);
+                    break;
+                case OBJECT:
+                    objectImport(file);
+                    break;
+            }
+            JOptionPane.showMessageDialog(frame, file,
+                    getText("message.import.success"),
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame, ex.getMessage(),
+                    getText("message.error"), JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void importAddresses(List<Address> newAddresses) {
+        try {
+            AddressBroker broker = AddressBroker.getInstance();
+            List<Address> oldAddresses = broker.findAll();
+            for (Address newAddress : newAddresses) {
+                if (oldAddresses.contains(newAddress)) {
+                    broker.update(newAddress);
+                } else {
+                    broker.insert(newAddress);
+                }
+            }
+            load();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame, getText(ex.getMessage()), getText("message.error"), JOptionPane.ERROR_MESSAGE);
+            Logger
+                    .getLogger(Controller.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void csvImport(File file) throws FileNotFoundException, IOException {
+        CSVReader csvReader = new CSVReader(new FileReader(file), ',', '"');
+        List<String[]> addresses = csvReader.readAll();
+        if (addresses.get(0)[0].equals("id")) {
+            addresses.remove(0);
+        }
+        List<Address> newAddresses = new ArrayList<>();
+        Address address;
+        for (String[] line : addresses) {
+            address = new Address();
+            address.setId(new Integer(line[0]));
+            address.setLastname(line[1]);
+            address.setFirstname(line[2]);
+            address.setEmail(line[3]);
+            address.setEmailAdditional(line[4]);
+            address.setHomepage(line[5]);
+            address.setFixedNetwork(line[6]);
+            address.setMobile(line[7]);
+            newAddresses.add(address);
+        }
+
+        importAddresses(newAddresses);
+
+    }
+
+    private void objectImport(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
+        FileInputStream fileIn =
+                new FileInputStream(file);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        List<Address> newAddresses = (List<Address>) in.readObject();
+        in.close();
+        fileIn.close();
+        importAddresses(newAddresses);
+    }
+
+    private void objectExport(File file) throws FileNotFoundException, IOException {
+        FileOutputStream fileOut =
+                new FileOutputStream(file);
+        ObjectOutputStream out =
+                new ObjectOutputStream(fileOut);
+        out.writeObject(model.getData());
+        out.close();
+        fileOut.close();
 
     }
 
     private void csvExport(File file) throws Exception {
         List<Address> data = model.getData();
         PrintWriter out = new PrintWriter(new FileWriter(file));
-        String quote = "\"";
-        String sep = ";";
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(quote + getText("address.id") + quote + sep);
-        sb.append(quote + getText("address.lastname") + quote
-                + sep);
-        sb.append(quote + getText("address.firstname") + quote
-                + sep);
-        sb.append(quote + getText("address.email") + quote + sep);
-        sb.append(quote + getText("address.email_additional")
-                + quote + sep);
-        sb.append(quote + getText("address.homepage") + quote + sep);
-        sb.append(quote + getText("address.fixed_network") + quote + sep);
-        sb.append(quote + getText("address.mobile") + quote);
-
-        out.println(sb);
-
-        for (Address a : data) {
-            sb = new StringBuilder();
-            sb.append(quote).append(a.getId()).append(quote).append(sep);
-            sb.append(quote).append(a.getLastname()).append(quote).append(sep);
-            sb.append(quote).append(a.getFirstname()).append(quote).append(sep);
-            sb.append(quote).append(a.getEmail()).append(quote).append(sep);
-            sb.append(quote).append(a.getEmailAdditional()).append(quote).append(sep);
-            sb.append(quote).append(a.getHomepage()).append(quote).append(sep);
-            sb.append(quote).append(a.getFixedNetwork()).append(quote).append(sep);
-            sb.append(quote).append(a.getMobile()).append(quote);
-            out.println(sb);
+        String columns = quote + StringUtils.join(Address.COLUMN_NAMES, quote + sep + quote) + quote;
+        out.println(columns);
+        String addressRow;
+        for (Address address : data) {
+            addressRow = quote + StringUtils.join(address.getAddressDataAsStringList(), quote + sep + quote) + quote;
+            out.println(addressRow);
         }
-
         out.close();
     }
 

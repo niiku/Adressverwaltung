@@ -50,6 +50,8 @@ public static AddressBroker getInstance() {
   public List<Address> findAll() throws Exception {
     return query("select * from address order by lastname, firstname");
   }
+  
+  
 
   // Eine neue Adresse speichern mit Rückgabe des generierten
   // Schlüssels

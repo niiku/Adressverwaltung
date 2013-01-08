@@ -5,27 +5,23 @@ import java.util.List;
 import java.util.Vector;
 
 import de.gkjava.addr.persistence.AddressBroker;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 
-/**
- * @author  vmadmin
- */
+
 public class Model {
-  /**
- * @uml.property  name="data"
- */
-private List<Address> data;
+
+    private List<Address> data;
+    
 
   public void setData() throws Exception {
     data = AddressBroker.getInstance().findAll();
   }
 
-  /**
- * @return
- * @uml.property  name="data"
- */
-public List<Address> getData() {
+ public List<Address> getData() {
     return data;
   }
+ 
 
   // Erzeugung der sortierten Namensliste für die Anzeige
   public Vector<String> getNames() {

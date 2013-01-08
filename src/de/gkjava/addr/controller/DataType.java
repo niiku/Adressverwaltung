@@ -8,6 +8,6 @@ package de.gkjava.addr.controller;
  *
  * @author niiku
  */
-public enum Export {
+public enum DataType {
     CSV, OBJECT;
 }

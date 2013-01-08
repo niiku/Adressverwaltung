@@ -2,13 +2,17 @@ package de.gkjava.addr.model;
 
 import java.io.Serializable;
 import java.text.Collator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author vmadmin
  */
 public class Address implements Comparable<Address>, Serializable {
 
-    private int id;
+    private Integer id;
     private String lastname;
     private String firstname;
     private String email;
@@ -16,8 +20,9 @@ public class Address implements Comparable<Address>, Serializable {
     private String homepage;
     private String fixedNetwork;
     private String mobile;
+    public static final String[] COLUMN_NAMES = new String[]{"id", "lastname", "firstname", "email", "emailAdditional", "homepage", "fixedNetwork", "mobile"};
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -40,7 +45,6 @@ public class Address implements Comparable<Address>, Serializable {
     public void setMobile(String mobile) {
         this.mobile = mobile;
     }
-    
 
     public String getLastname() {
         return lastname;
@@ -88,5 +92,33 @@ public class Address implements Comparable<Address>, Serializable {
         String s1 = lastname + ", " + firstname;
         String s2 = a.getLastname() + ", " + a.getFirstname();
         return collator.compare(s1, s2);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Address)) {
+            return false;
+        }
+        Address address = (Address) obj;
+        return firstname.equals(address.firstname) && lastname.equals(address.lastname);
+    }
+
+    public List<String> getAddressDataAsStringList() {
+        List<String> addressData = new ArrayList<String>();
+        for (String columnName : COLUMN_NAMES) {
+
+            try {
+                addressData.add("" + getClass().getDeclaredField(columnName).get(this));
+            } catch (NoSuchFieldException ex) {
+                Logger.getLogger(Address.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(Address.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(Address.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(Address.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return addressData;
     }
 }
